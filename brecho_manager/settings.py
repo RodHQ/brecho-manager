@@ -21,14 +21,14 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "core",
-    "users",
-    "clients",
-    "suppliers",
-    "inventory",
-    "transactions",
+    "usuarios",
+    "clientes",
+    "fornecedores",
+    "estoque",
+    "transacoes",
 ]
 
-AUTH_USER_MODEL = "users.User"
+AUTH_USER_MODEL = "usuarios.Usuario"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
