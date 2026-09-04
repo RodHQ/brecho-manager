@@ -1,30 +1,29 @@
-from datetime import datetime
+import datetime
 
-import mongoengine as me
+from django.contrib.auth.hashers import check_password, make_password
+from mongoengine import BooleanField, DateTimeField, Document, EmailField, StringField
 
 
-class Usuario(me.Document):
-    """Usuário customizado do sistema, modelado como Document do MongoEngine.
+class Usuario(Document):
+    """Usuário do sistema (MongoEngine Document)."""
 
-    A senha deve ser gerenciada manualmente (por exemplo, com
-    `django.contrib.auth.hashers.make_password`), já que este Document não
-    está integrado ao `django.contrib.auth`.
-    """
+    username = StringField(max_length=150, required=True, unique=True)
+    email = EmailField(required=True, unique=True)
+    password = StringField(required=True)  # armazenado como hash
+    nome = StringField(max_length=150)
+    telefone = StringField(max_length=20)
+    data_criacao = DateTimeField(default=datetime.datetime.utcnow)
+    ativo = BooleanField(default=True)
 
-    username = me.StringField(verbose_name="Usuário", max_length=150, required=True, unique=True)
-    nome = me.StringField(verbose_name="Nome", max_length=150, default="")
-    email = me.EmailField(verbose_name="Email", required=False)
-    senha = me.StringField(verbose_name="Senha (hash)", default="")
-    telefone = me.StringField(verbose_name="Telefone", max_length=20, default="")
-    data_criacao = me.DateTimeField(verbose_name="Data de criação", default=datetime.utcnow)
-    ativo = me.BooleanField(verbose_name="Ativo", default=True)
-    is_staff = me.BooleanField(verbose_name="Membro da equipe", default=False)
-    is_superuser = me.BooleanField(verbose_name="Superusuário", default=False)
+    meta = {"collection": "usuarios"}
 
-    meta = {
-        "collection": "usuarios",
-        "ordering": ["username"],
-    }
+    def set_password(self, raw_password):
+        """Gera e armazena o hash da senha informada."""
+        self.password = make_password(raw_password)
+
+    def check_password(self, raw_password):
+        """Verifica se a senha informada corresponde ao hash armazenado."""
+        return check_password(raw_password, self.password)
 
     def __str__(self):
         return self.nome or self.username

@@ -1,28 +1,35 @@
-from datetime import datetime
+import datetime
 
-import mongoengine as me
+from mongoengine import (
+    NULLIFY,
+    DateTimeField,
+    DecimalField,
+    Document,
+    IntField,
+    ReferenceField,
+    StringField,
+)
+
+from fornecedores.models import Fornecedor
 
 
-class Produto(me.Document):
-    """Produto disponível no estoque do brechó."""
+class Produto(Document):
+    """Produto disponível no estoque do brechó (MongoEngine Document).
 
-    nome = me.StringField(verbose_name="Nome", max_length=150, required=True)
-    descricao = me.StringField(verbose_name="Descrição", default="")
-    sku = me.StringField(verbose_name="SKU", max_length=50, required=True, unique=True)
-    preco = me.DecimalField(verbose_name="Preço", precision=2, force_string=True, required=True)
-    quantidade = me.IntField(verbose_name="Quantidade em estoque", default=0, min_value=0)
-    data_criacao = me.DateTimeField(verbose_name="Data de criação", default=datetime.utcnow)
-    fornecedor = me.ReferenceField(
-        "Fornecedor",
-        verbose_name="Fornecedor",
-        reverse_delete_rule=me.NULLIFY,
-        null=True,
-    )
+    O campo ``fornecedor`` referencia o :class:`fornecedores.models.Fornecedor`.
+    Para consultar os produtos de um fornecedor use:
+    ``Produto.objects(fornecedor=fornecedor)``.
+    """
 
-    meta = {
-        "collection": "produtos",
-        "ordering": ["nome"],
-    }
+    nome = StringField(max_length=150, required=True)
+    descricao = StringField()
+    sku = StringField(max_length=50, required=True, unique=True)
+    preco = DecimalField(precision=2, force_string=True, required=True)
+    quantidade = IntField(default=0, min_value=0)
+    data_criacao = DateTimeField(default=datetime.datetime.utcnow)
+    fornecedor = ReferenceField(Fornecedor, reverse_delete_rule=NULLIFY)
+
+    meta = {"collection": "estoque"}
 
     def __str__(self):
         return self.nome

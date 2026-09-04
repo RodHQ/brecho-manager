@@ -1,24 +1,21 @@
-from datetime import datetime
+import datetime
 
-import mongoengine as me
+from mongoengine import BooleanField, DateTimeField, Document, EmailField, StringField
 
 
-class Fornecedor(me.Document):
-    """Fornecedor de produtos para o brechó."""
+class Fornecedor(Document):
+    """Fornecedor de produtos para o brechó (MongoEngine Document)."""
 
-    nome = me.StringField(verbose_name="Nome", max_length=150, required=True)
-    email = me.EmailField(verbose_name="Email", required=False)
-    telefone = me.StringField(verbose_name="Telefone", max_length=20, default="")
-    endereco = me.StringField(verbose_name="Endereço", max_length=255, default="")
-    cnpj = me.StringField(verbose_name="CNPJ", max_length=18, required=True, unique=True)
-    contato = me.StringField(verbose_name="Contato", max_length=150, default="")
-    ativo = me.BooleanField(verbose_name="Ativo", default=True)
-    data_cadastro = me.DateTimeField(verbose_name="Data de cadastro", default=datetime.utcnow)
+    nome = StringField(max_length=150, required=True)
+    email = EmailField()
+    telefone = StringField(max_length=20)
+    endereco = StringField(max_length=255)
+    cnpj = StringField(max_length=18, required=True, unique=True)
+    contato = StringField(max_length=150)
+    ativo = BooleanField(default=True)
+    data_cadastro = DateTimeField(default=datetime.datetime.utcnow)
 
-    meta = {
-        "collection": "fornecedores",
-        "ordering": ["nome"],
-    }
+    meta = {"collection": "fornecedores"}
 
     def __str__(self):
         return self.nome
