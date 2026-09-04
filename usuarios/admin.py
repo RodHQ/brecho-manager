@@ -1,14 +1,3 @@
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-
-from .models import Usuario
-
-
-@admin.register(Usuario)
-class UsuarioAdmin(UserAdmin):
-    list_display = ("username", "nome", "email", "telefone", "ativo", "data_criacao")
-    list_filter = ("ativo", "is_staff", "is_superuser")
-    search_fields = ("username", "nome", "email", "telefone")
-    fieldsets = UserAdmin.fieldsets + (
-        ("Informações adicionais", {"fields": ("nome", "telefone", "ativo")}),
-    )
+# Os modelos deste app agora são `Document`s do MongoEngine e não podem ser
+# registrados no Django Admin (que exige `django.db.models.Model`). Para
+# gerenciar os dados visualmente, utilize o Mongo Express (veja o README.md).

@@ -1,21 +1,24 @@
-from django.db import models
+from datetime import datetime
+
+import mongoengine as me
 
 
-class Fornecedor(models.Model):
+class Fornecedor(me.Document):
     """Fornecedor de produtos para o brechó."""
 
-    nome = models.CharField("Nome", max_length=150)
-    email = models.EmailField("Email", blank=True)
-    telefone = models.CharField("Telefone", max_length=20, blank=True)
-    endereco = models.CharField("Endereço", max_length=255, blank=True)
-    cnpj = models.CharField("CNPJ", max_length=18, unique=True)
-    contato = models.CharField("Contato", max_length=150, blank=True)
-    ativo = models.BooleanField("Ativo", default=True)
-    data_cadastro = models.DateTimeField("Data de cadastro", auto_now_add=True)
+    nome = me.StringField(verbose_name="Nome", max_length=150, required=True)
+    email = me.EmailField(verbose_name="Email", required=False)
+    telefone = me.StringField(verbose_name="Telefone", max_length=20, default="")
+    endereco = me.StringField(verbose_name="Endereço", max_length=255, default="")
+    cnpj = me.StringField(verbose_name="CNPJ", max_length=18, required=True, unique=True)
+    contato = me.StringField(verbose_name="Contato", max_length=150, default="")
+    ativo = me.BooleanField(verbose_name="Ativo", default=True)
+    data_cadastro = me.DateTimeField(verbose_name="Data de cadastro", default=datetime.utcnow)
 
-    class Meta:
-        verbose_name = "Fornecedor"
-        verbose_name_plural = "Fornecedores"
+    meta = {
+        "collection": "fornecedores",
+        "ordering": ["nome"],
+    }
 
     def __str__(self):
         return self.nome
