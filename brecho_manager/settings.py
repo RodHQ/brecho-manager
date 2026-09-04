@@ -3,7 +3,12 @@
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+from mongoengine import connect
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
@@ -27,8 +32,6 @@ INSTALLED_APPS = [
     "estoque",
     "transacoes",
 ]
-
-AUTH_USER_MODEL = "usuarios.Usuario"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -60,12 +63,31 @@ TEMPLATES = [
 WSGI_APPLICATION = "brecho_manager.wsgi.application"
 ASGI_APPLICATION = "brecho_manager.asgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
+# MongoDB é o único banco de dados da aplicação, acessado pelos modelos das
+# apps de domínio através do MongoEngine (ver `mongoengine.Document` nos
+# módulos `models.py`). As credenciais e o host/porta vêm das variáveis de
+# ambiente carregadas do `.env`.
+MONGO_DB = os.environ.get("MONGO_DB", "brecho_manager")
+MONGO_USERNAME = os.environ.get("MONGO_USERNAME", "")
+MONGO_PASSWORD = os.environ.get("MONGO_PASSWORD", "")
+MONGO_HOST = os.environ.get("MONGO_HOST", "localhost")
+MONGO_PORT = int(os.environ.get("MONGO_PORT", "27017"))
+
+connect(
+    db=MONGO_DB,
+    username=MONGO_USERNAME or None,
+    password=MONGO_PASSWORD or None,
+    host=MONGO_HOST,
+    port=MONGO_PORT,
+    authentication_source="admin" if MONGO_USERNAME else None,
+)
+
+# Não há banco de dados relacional configurado. Recursos do Django que
+# dependem de um banco relacional (Django Admin, sessões e autenticação
+# padrão via `django.contrib.auth`) não funcionam sem uma configuração
+# adicional, já que os modelos de domínio agora são `Document`s do
+# MongoEngine em vez de `Model`s do Django ORM.
+DATABASES = {}
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},

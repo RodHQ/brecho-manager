@@ -1,50 +1,53 @@
-from django.db import models
+from datetime import datetime
 
-from clientes.models import Cliente
-from estoque.models import Produto
-from fornecedores.models import Fornecedor
+import mongoengine as me
 
 
-class Transacao(models.Model):
+class Transacao(me.Document):
     """Registro de movimentação de estoque (entrada ou saída)."""
 
     TIPO_ENTRADA = "entrada"
     TIPO_SAIDA = "saida"
-    TIPO_CHOICES = [
+    TIPO_CHOICES = (
         (TIPO_ENTRADA, "Entrada"),
         (TIPO_SAIDA, "Saída"),
-    ]
+    )
 
-    tipo = models.CharField("Tipo", max_length=10, choices=TIPO_CHOICES)
-    cliente = models.ForeignKey(
-        Cliente,
+    tipo = me.StringField(
+        verbose_name="Tipo",
+        max_length=10,
+        choices=TIPO_CHOICES,
+        required=True,
+    )
+    cliente = me.ReferenceField(
+        "Cliente",
         verbose_name="Cliente",
-        on_delete=models.SET_NULL,
-        related_name="transacoes",
+        reverse_delete_rule=me.NULLIFY,
         null=True,
-        blank=True,
     )
-    fornecedor = models.ForeignKey(
-        Fornecedor,
+    fornecedor = me.ReferenceField(
+        "Fornecedor",
         verbose_name="Fornecedor",
-        on_delete=models.SET_NULL,
-        related_name="transacoes",
+        reverse_delete_rule=me.NULLIFY,
         null=True,
-        blank=True,
     )
-    produto = models.ForeignKey(
-        Produto,
+    produto = me.ReferenceField(
+        "Produto",
         verbose_name="Produto",
-        on_delete=models.PROTECT,
-        related_name="transacoes",
+        reverse_delete_rule=me.DENY,
+        required=True,
     )
-    quantidade = models.PositiveIntegerField("Quantidade")
-    valor = models.DecimalField("Valor", max_digits=10, decimal_places=2)
-    data = models.DateTimeField("Data", auto_now_add=True)
+    quantidade = me.IntField(verbose_name="Quantidade", required=True, min_value=1)
+    valor = me.DecimalField(verbose_name="Valor", precision=2, force_string=True, required=True)
+    data = me.DateTimeField(verbose_name="Data", default=datetime.utcnow)
 
-    class Meta:
-        verbose_name = "Transação"
-        verbose_name_plural = "Transações"
+    meta = {
+        "collection": "transacoes",
+        "ordering": ["-data"],
+    }
+
+    def get_tipo_display(self):
+        return dict(self.TIPO_CHOICES).get(self.tipo, self.tipo)
 
     def __str__(self):
         return f"{self.get_tipo_display()} - {self.produto} ({self.quantidade})"

@@ -1,10 +1,3 @@
-from django.contrib import admin
-
-from .models import Transacao
-
-
-@admin.register(Transacao)
-class TransacaoAdmin(admin.ModelAdmin):
-    list_display = ("tipo", "produto", "cliente", "fornecedor", "quantidade", "valor", "data")
-    list_filter = ("tipo",)
-    search_fields = ("produto__nome", "cliente__nome", "fornecedor__nome")
+# Os modelos deste app agora são `Document`s do MongoEngine e não podem ser
+# registrados no Django Admin (que exige `django.db.models.Model`). Para
+# gerenciar os dados visualmente, utilize o Mongo Express (veja o README.md).

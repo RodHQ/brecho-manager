@@ -1,10 +1,3 @@
-from django.contrib import admin
-
-from .models import Produto
-
-
-@admin.register(Produto)
-class ProdutoAdmin(admin.ModelAdmin):
-    list_display = ("nome", "sku", "preco", "quantidade", "fornecedor", "data_criacao")
-    list_filter = ("fornecedor",)
-    search_fields = ("nome", "sku")
+# Os modelos deste app agora são `Document`s do MongoEngine e não podem ser
+# registrados no Django Admin (que exige `django.db.models.Model`). Para
+# gerenciar os dados visualmente, utilize o Mongo Express (veja o README.md).

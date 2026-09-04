@@ -1,10 +1,3 @@
-from django.contrib import admin
-
-from .models import Fornecedor
-
-
-@admin.register(Fornecedor)
-class FornecedorAdmin(admin.ModelAdmin):
-    list_display = ("nome", "cnpj", "email", "telefone", "contato", "ativo", "data_cadastro")
-    list_filter = ("ativo",)
-    search_fields = ("nome", "cnpj", "email", "contato")
+# Os modelos deste app agora são `Document`s do MongoEngine e não podem ser
+# registrados no Django Admin (que exige `django.db.models.Model`). Para
+# gerenciar os dados visualmente, utilize o Mongo Express (veja o README.md).
