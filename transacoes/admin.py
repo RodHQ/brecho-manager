@@ -1,10 +1,4 @@
-from django.contrib import admin
-
-from .models import Transacao
-
-
-@admin.register(Transacao)
-class TransacaoAdmin(admin.ModelAdmin):
-    list_display = ("tipo", "produto", "cliente", "fornecedor", "quantidade", "valor", "data")
-    list_filter = ("tipo",)
-    search_fields = ("produto__nome", "cliente__nome", "fornecedor__nome")
+# O Django Admin (django.contrib.admin) depende do Django ORM e não é
+# compatível diretamente com Documents do MongoEngine, por isso não está
+# habilitado em INSTALLED_APPS. Um painel administrativo específico para
+# MongoEngine pode ser criado separadamente, se necessário.

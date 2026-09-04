@@ -1,21 +1,21 @@
-from django.db import models
+import datetime
+
+from mongoengine import BooleanField, DateTimeField, Document, EmailField, StringField
 
 
-class Fornecedor(models.Model):
-    """Fornecedor de produtos para o brechó."""
+class Fornecedor(Document):
+    """Fornecedor de produtos para o brechó (MongoEngine Document)."""
 
-    nome = models.CharField("Nome", max_length=150)
-    email = models.EmailField("Email", blank=True)
-    telefone = models.CharField("Telefone", max_length=20, blank=True)
-    endereco = models.CharField("Endereço", max_length=255, blank=True)
-    cnpj = models.CharField("CNPJ", max_length=18, unique=True)
-    contato = models.CharField("Contato", max_length=150, blank=True)
-    ativo = models.BooleanField("Ativo", default=True)
-    data_cadastro = models.DateTimeField("Data de cadastro", auto_now_add=True)
+    nome = StringField(max_length=150, required=True)
+    email = EmailField()
+    telefone = StringField(max_length=20)
+    endereco = StringField(max_length=255)
+    cnpj = StringField(max_length=18, required=True, unique=True)
+    contato = StringField(max_length=150)
+    ativo = BooleanField(default=True)
+    data_cadastro = DateTimeField(default=datetime.datetime.utcnow)
 
-    class Meta:
-        verbose_name = "Fornecedor"
-        verbose_name_plural = "Fornecedores"
+    meta = {"collection": "fornecedores"}
 
     def __str__(self):
         return self.nome

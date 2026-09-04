@@ -1,18 +1,29 @@
-from django.contrib.auth.models import AbstractUser
-from django.db import models
+import datetime
+
+from django.contrib.auth.hashers import check_password, make_password
+from mongoengine import BooleanField, DateTimeField, Document, EmailField, StringField
 
 
-class Usuario(AbstractUser):
-    """Usuário customizado do sistema, baseado em AbstractUser."""
+class Usuario(Document):
+    """Usuário do sistema (MongoEngine Document)."""
 
-    nome = models.CharField("Nome", max_length=150, blank=True)
-    telefone = models.CharField("Telefone", max_length=20, blank=True)
-    data_criacao = models.DateTimeField("Data de criação", auto_now_add=True)
-    ativo = models.BooleanField("Ativo", default=True)
+    username = StringField(max_length=150, required=True, unique=True)
+    email = EmailField(required=True, unique=True)
+    password = StringField(required=True)  # armazenado como hash
+    nome = StringField(max_length=150)
+    telefone = StringField(max_length=20)
+    data_criacao = DateTimeField(default=datetime.datetime.utcnow)
+    ativo = BooleanField(default=True)
 
-    class Meta:
-        verbose_name = "Usuário"
-        verbose_name_plural = "Usuários"
+    meta = {"collection": "usuarios"}
+
+    def set_password(self, raw_password):
+        """Gera e armazena o hash da senha informada."""
+        self.password = make_password(raw_password)
+
+    def check_password(self, raw_password):
+        """Verifica se a senha informada corresponde ao hash armazenado."""
+        return check_password(raw_password, self.password)
 
     def __str__(self):
         return self.nome or self.username

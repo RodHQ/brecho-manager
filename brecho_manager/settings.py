@@ -3,7 +3,12 @@
 import os
 from pathlib import Path
 
+import mongoengine
+from dotenv import load_dotenv
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
@@ -14,11 +19,6 @@ ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",")
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS if host.strip()]
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
     "django.contrib.staticfiles",
     "core",
     "usuarios",
@@ -28,15 +28,10 @@ INSTALLED_APPS = [
     "transacoes",
 ]
 
-AUTH_USER_MODEL = "usuarios.Usuario"
-
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
@@ -50,8 +45,6 @@ TEMPLATES = [
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
@@ -60,19 +53,32 @@ TEMPLATES = [
 WSGI_APPLICATION = "brecho_manager.wsgi.application"
 ASGI_APPLICATION = "brecho_manager.asgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
+# Não usamos o Django ORM (MongoDB via MongoEngine é o único banco de dados).
+DATABASES = {}
 
-AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
-]
+# Conexão com o MongoDB via MongoEngine, configurada por variáveis de ambiente.
+MONGO_DB_NAME = os.environ.get("MONGO_DB_NAME", "brecho_manager")
+MONGO_HOST = os.environ.get("MONGO_HOST", "localhost")
+MONGO_PORT = int(os.environ.get("MONGO_PORT", "27017"))
+MONGO_USERNAME = os.environ.get("MONGO_USERNAME") or None
+MONGO_PASSWORD = os.environ.get("MONGO_PASSWORD") or None
+MONGO_AUTHENTICATION_SOURCE = os.environ.get("MONGO_AUTHENTICATION_SOURCE", "admin")
+
+MONGODB_SETTINGS = {
+    "db": MONGO_DB_NAME,
+    "host": MONGO_HOST,
+    "port": MONGO_PORT,
+}
+if MONGO_USERNAME and MONGO_PASSWORD:
+    MONGODB_SETTINGS.update(
+        {
+            "username": MONGO_USERNAME,
+            "password": MONGO_PASSWORD,
+            "authentication_source": MONGO_AUTHENTICATION_SOURCE,
+        }
+    )
+
+mongoengine.connect(**MONGODB_SETTINGS)
 
 LANGUAGE_CODE = "pt-br"
 TIME_ZONE = "America/Sao_Paulo"
@@ -82,4 +88,3 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

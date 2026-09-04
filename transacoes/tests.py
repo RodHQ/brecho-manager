@@ -1,5 +1,4 @@
-from django.test import TestCase
-
+from brecho_manager.testing import MongoTestCase
 from clientes.models import Cliente
 from estoque.models import Produto
 from fornecedores.models import Fornecedor
@@ -8,9 +7,18 @@ from usuarios.models import Usuario
 from .models import Transacao
 
 
-class ModelosEmPortuguesTests(TestCase):
+class ModelosEmPortuguesTests(MongoTestCase):
+    def tearDown(self):
+        Transacao.objects.delete()
+        Produto.objects.delete()
+        Cliente.objects.delete()
+        Fornecedor.objects.delete()
+        Usuario.objects.delete()
+
     def test_modelos_e_relacionamentos_em_portugues(self):
-        usuario = Usuario.objects.create_user(username="maria", nome="Maria")
+        usuario = Usuario(username="maria", email="maria@example.com", nome="Maria")
+        usuario.set_password("segredo123")
+        usuario.save()
         cliente = Cliente.objects.create(
             nome="Ana",
             cpf_cnpj="12345678901",
@@ -33,9 +41,9 @@ class ModelosEmPortuguesTests(TestCase):
             valor="99.90",
         )
 
-        self.assertEqual(usuario._meta.label, "usuarios.Usuario")
-        self.assertEqual(cliente._meta.label, "clientes.Cliente")
-        self.assertEqual(fornecedor._meta.label, "fornecedores.Fornecedor")
-        self.assertEqual(produto._meta.label, "estoque.Produto")
-        self.assertEqual(transacao._meta.label, "transacoes.Transacao")
+        self.assertEqual(usuario._collection.name, "usuarios")
+        self.assertEqual(cliente._collection.name, "clientes")
+        self.assertEqual(fornecedor._collection.name, "fornecedores")
+        self.assertEqual(produto._collection.name, "estoque")
+        self.assertEqual(transacao._collection.name, "transacoes")
         self.assertEqual(str(transacao), "Saída - Vestido (1)")

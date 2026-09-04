@@ -1,10 +1,4 @@
-from django.contrib import admin
-
-from .models import Cliente
-
-
-@admin.register(Cliente)
-class ClienteAdmin(admin.ModelAdmin):
-    list_display = ("nome", "cpf_cnpj", "email", "telefone", "cidade", "usuario", "data_cadastro")
-    list_filter = ("cidade",)
-    search_fields = ("nome", "cpf_cnpj", "email", "telefone")
+# O Django Admin (django.contrib.admin) depende do Django ORM e não é
+# compatível diretamente com Documents do MongoEngine, por isso não está
+# habilitado em INSTALLED_APPS. Um painel administrativo específico para
+# MongoEngine pode ser criado separadamente, se necessário.
