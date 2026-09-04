@@ -38,7 +38,7 @@ class Transacao(me.Document):
         required=True,
     )
     quantidade = me.IntField(verbose_name="Quantidade", required=True, min_value=1)
-    valor = me.DecimalField(verbose_name="Valor", precision=2, required=True)
+    valor = me.DecimalField(verbose_name="Valor", precision=2, force_string=True, required=True)
     data = me.DateTimeField(verbose_name="Data", default=datetime.utcnow)
 
     meta = {
