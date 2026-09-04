@@ -1,9 +1,12 @@
 """Carregamento das variáveis de ambiente usadas pela aplicação desktop."""
 import os
+import warnings
 
 from dotenv import load_dotenv
 
 load_dotenv()
+
+DEFAULT_JWT_SECRET_KEY = "dev-secret-change-me"
 
 
 def _get_int(name, default):
@@ -29,7 +32,7 @@ class Config:
 
     RECOVERY_TOKEN_EXPIRY = _get_int("RECOVERY_TOKEN_EXPIRY", 86400)
 
-    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "dev-secret-change-me")
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", DEFAULT_JWT_SECRET_KEY)
     JWT_EXPIRY_DAYS = _get_int("JWT_EXPIRY_DAYS", 7)
 
     APP_NAME = os.getenv("APP_NAME", "Brecho Manager")
@@ -37,3 +40,11 @@ class Config:
 
 
 config = Config()
+
+if config.JWT_SECRET_KEY == DEFAULT_JWT_SECRET_KEY:
+    warnings.warn(
+        "JWT_SECRET_KEY não foi definido no ambiente/.env; usando um valor "
+        "padrão inseguro. Defina uma chave secreta forte antes de usar em "
+        "produção, pois qualquer pessoa pode forjar tokens válidos.",
+        stacklevel=2,
+    )

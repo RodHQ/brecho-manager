@@ -42,7 +42,7 @@ class AuthService:
 
     def gerar_token(self, usuario):
         """Gera um token JWT válido pelo período configurado (padrão: 7 dias)."""
-        agora = datetime.datetime.utcnow()
+        agora = datetime.datetime.now(datetime.timezone.utc)
         payload = {
             "sub": str(usuario.id),
             "username": usuario.username,

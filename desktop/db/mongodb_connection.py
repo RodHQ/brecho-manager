@@ -1,26 +1,32 @@
 """Conexão singleton com o MongoDB e operações de CRUD utilizadas pela app desktop."""
+import threading
+
 from pymongo import MongoClient, ReturnDocument
 
 from utils.config import config
 
 
 class MongoDBConnection:
-    """Implementação singleton da conexão com o MongoDB."""
+    """Implementação singleton (thread-safe) da conexão com o MongoDB."""
 
     _instance = None
+    _lock = threading.Lock()
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
-            cls._instance = super().__new__(cls)
-            cls._instance._initialized = False
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls)
+                    cls._instance._initialized = False
         return cls._instance
 
     def __init__(self, uri=None, db_name=None):
-        if self._initialized:
-            return
-        self._client = MongoClient(uri or config.MONGO_URI)
-        self._db = self._client[db_name or config.MONGO_DB]
-        self._initialized = True
+        with self._lock:
+            if self._initialized:
+                return
+            self._client = MongoClient(uri or config.MONGO_URI)
+            self._db = self._client[db_name or config.MONGO_DB]
+            self._initialized = True
 
     @property
     def db(self):
