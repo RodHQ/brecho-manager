@@ -72,3 +72,11 @@ relacional configurado (`DATABASES = {}`), então recursos que dependem dele,
 como autenticação padrão do `django.contrib.auth` e sessões, não funcionam
 sem configuração adicional. Para gerenciar os dados visualmente, utilize o
 Mongo Express.
+
+## Aplicação Desktop
+
+Além da aplicação Django, o repositório inclui uma aplicação desktop
+(PyQt6) com login, recuperação de senha por email e um dashboard inicial,
+integrada à mesma collection `usuarios` no MongoDB. Veja as instruções de
+instalação, configuração e execução em [`desktop/README.md`](desktop/README.md).
+

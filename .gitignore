@@ -18,3 +18,9 @@ staticfiles/
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Desktop app
+desktop/.token
+desktop/dist/
+desktop/build/
+desktop/*.spec
