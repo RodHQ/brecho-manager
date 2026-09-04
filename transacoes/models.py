@@ -33,8 +33,8 @@ class Transacao(Document):
     cliente = ReferenceField(Cliente, reverse_delete_rule=NULLIFY)
     fornecedor = ReferenceField(Fornecedor, reverse_delete_rule=NULLIFY)
     produto = ReferenceField(Produto, required=True, reverse_delete_rule=DENY)
-    quantidade = IntField(required=True, min_value=0)
-    valor = DecimalField(precision=2, required=True)
+    quantidade = IntField(required=True, min_value=1)
+    valor = DecimalField(precision=2, force_string=True, required=True)
     data = DateTimeField(default=datetime.datetime.utcnow)
 
     meta = {"collection": "transacoes"}

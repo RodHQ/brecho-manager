@@ -24,7 +24,7 @@ class Produto(Document):
     nome = StringField(max_length=150, required=True)
     descricao = StringField()
     sku = StringField(max_length=50, required=True, unique=True)
-    preco = DecimalField(precision=2, required=True)
+    preco = DecimalField(precision=2, force_string=True, required=True)
     quantidade = IntField(default=0, min_value=0)
     data_criacao = DateTimeField(default=datetime.datetime.utcnow)
     fornecedor = ReferenceField(Fornecedor, reverse_delete_rule=NULLIFY)
